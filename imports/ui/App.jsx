@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
  
 
-
 // App component - represents the whole app
 export default class App extends Component {
   constructor(props) {
@@ -15,7 +14,7 @@ export default class App extends Component {
       yPos: 0,
       fieldWidth: 800*0.94-32,
       fieldHeight: 500*0.94-32,
-      speed: 4,
+      speed: 8,
       sprite_size: 32,
     };
     window.addEventListener("keydown", this.keyListener.bind(this), true);
@@ -40,7 +39,7 @@ export default class App extends Component {
             this.setState({cd: 'L', xPos: this.state.xPos-this.state.speed, walkpos: (this.state.walkpos+1)%3});
             return;
           }else{
-            this.setState({cd: 'L', xPos: 0, walkpos: (this.state.walkpos+1)%3});
+            this.setState({cd: 'L', xPos: 0});
             return;
           }
         }
@@ -49,25 +48,25 @@ export default class App extends Component {
             this.setState({cd: 'U' , yPos: this.state.yPos-this.state.speed, walkpos: (this.state.walkpos+1)%3});
             return;
           }else{
-            this.setState({cd: 'U' , yPos: 0, walkpos: (this.state.walkpos+1)%3});
+            this.setState({cd: 'U' , yPos: 0});
             return;
           }
         }
         if (key === 39 ){
-          if ( this.state.xPos<this.state.fieldWidth-this.state.sprite_size-this.state.speed){
+          if ( this.state.xPos<this.state.fieldWidth-this.state.speed){
             this.setState({cd: 'R', xPos: this.state.xPos+this.state.speed, walkpos: (this.state.walkpos+1)%3});
             return;
           }else{
-            this.setState({cd: 'R', xPos: this.state.fieldWidth, walkpos: (this.state.walkpos+1)%3});
+            this.setState({cd: 'R', xPos: this.state.fieldWidth});
             return;
           }
         }
         if (key === 40 ){
-          if(this.state.yPos<this.state.fieldHeight-this.state.sprite_size-this.state.speed){
+          if(this.state.yPos<this.state.fieldHeight-this.state.speed){
             this.setState({cd: 'D', yPos: this.state.yPos+this.state.speed, walkpos: (this.state.walkpos+1)%3});
             return;
           }else{
-            this.setState({cd: 'D', yPos: this.state.fieldHeight, walkpos: (this.state.walkpos+1)%3});
+            this.setState({cd: 'D', yPos: this.state.fieldHeight});
             return;
           }
         }
