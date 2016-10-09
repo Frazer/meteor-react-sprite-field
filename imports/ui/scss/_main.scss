@@ -1,38 +1,5 @@
-$sprite_size: -32px;
+@import "{}/imports/ui/scss/sprites";
 
-@mixin spritebox($row, $column){
-  background-position: 	 (($sprite_size*$row)+1) $sprite_size*$column;	
-}
-
-.sprite {
-  background-image: url('sprites_by_demonhuntrpg_transparent.png');
-  background-repeat: no-repeat;	
-  width: - $sprite_size;
-  height: - $sprite_size;
-  position: relative;
-}
-
-//create every spritebox  -  could use @extend .sprite
-@for $i from 0 through 3{
-
-	@for $j from 0 through 1{
-		@for $pos from 0 through 2{
-		  .character-#{$i}-#{$j}-D-#{$pos} {
-			  @include spritebox($i*3+$pos,$j*4);
-		  }
-		  .character-#{$i}-#{$j}-L-#{$pos} {
-			  @include spritebox($i*3+$pos,$j*4+1);
-		  }
-		  .character-#{$i}-#{$j}-R-#{$pos} {
-			  @include spritebox($i*3+$pos,$j*4+2);
-		  }
-		  .character-#{$i}-#{$j}-U-#{$pos} {
-			  @include spritebox($i*3+$pos,$j*4+3);
-		  }
-		}
-	}
-
-}
 
 
 .field_border{
@@ -59,3 +26,7 @@ $sprite_size: -32px;
 	
 
 }
+
+@include divide_sprite_map('good_guys', 'sprites_by_demonhuntrpg_transparent.png', 32px, 32px, 4 , 2 , 3)
+@include divide_sprite_map('mario', 'mario_sprite.png', 28px, 40px, 2 , 1 , 3)
+@include divide_sprite_map('super_girl', 'sprite_by_tariyoe.png', 123px, 123px, 1 , 1 , 8)

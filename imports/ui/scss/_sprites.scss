@@ -1,0 +1,48 @@
+
+@mixin sprite($name, $url, $width, $height) {
+	%#{$name} {
+	  background-repeat: no-repeat;	
+	  position: relative;
+	  background-image: url($url);
+	  width: $width;
+	  height: $height;
+
+	}
+}
+
+@mixin spritebox($row, $column, $sprite_height, $sprite_width){
+  background-position: 	 (-($sprite_height*$row)) (-($sprite_width*$column));
+}
+
+
+@mixin divide_sprite_map($name, $url,  $sprite_height, $sprite_width, $cols, $rows, $steps){
+
+	@include sprite($name, $url, $sprite_height, $sprite_width)
+
+
+	@for $i from 0 through $cols - 1{
+
+		@for $j from 0 through $rows - 1{
+			@for $pos from 0 through $steps - 1{
+			  .#{$name}-#{$i}-#{$j}-D-#{$pos} {
+			  	  @extend %#{$name};
+				  @include spritebox($i*3+$pos,$j*4, $sprite_height, $sprite_width);
+			  }
+			  .#{$name}-#{$i}-#{$j}-L-#{$pos} {
+			  	  @extend %#{$name};
+				  @include spritebox($i*3+$pos,$j*4+1, $sprite_height, $sprite_width);
+			  }
+			  .#{$name}-#{$i}-#{$j}-R-#{$pos} {
+				  @extend %#{$name};
+				  @include spritebox($i*3+$pos,$j*4+2, $sprite_height, $sprite_width);
+			  }
+			  .#{$name}-#{$i}-#{$j}-U-#{$pos} {
+				  @extend %#{$name};
+				  @include spritebox($i*3+$pos,$j*4+3, $sprite_height, $sprite_width);
+			  }
+			}
+		}
+
+	}
+}
+
