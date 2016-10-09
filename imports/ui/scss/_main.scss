@@ -1,0 +1,61 @@
+$sprite_size: -32px;
+
+@mixin spritebox($row, $column){
+  background-position: 	 (($sprite_size*$row)+1) $sprite_size*$column;	
+}
+
+.sprite {
+  background-image: url('sprites_by_demonhuntrpg_transparent.png');
+  background-repeat: no-repeat;	
+  width: - $sprite_size;
+  height: - $sprite_size;
+  position: relative;
+}
+
+//create every spritebox  -  could use @extend .sprite
+@for $i from 0 through 3{
+
+	@for $j from 0 through 1{
+		@for $pos from 0 through 2{
+		  .character-#{$i}-#{$j}-D-#{$pos} {
+			  @include spritebox($i*3+$pos,$j*4);
+		  }
+		  .character-#{$i}-#{$j}-L-#{$pos} {
+			  @include spritebox($i*3+$pos,$j*4+1);
+		  }
+		  .character-#{$i}-#{$j}-R-#{$pos} {
+			  @include spritebox($i*3+$pos,$j*4+2);
+		  }
+		  .character-#{$i}-#{$j}-U-#{$pos} {
+			  @include spritebox($i*3+$pos,$j*4+3);
+		  }
+		}
+	}
+
+}
+
+
+.field_border{
+	border:1px solid black;
+	background-image:url(wood.jpg);
+	z-index:2;
+	-moz-border-radius:8px;	
+	border-radius:8px;
+	align:center;
+	margin: 0 auto;
+	
+	width: 800px;
+	height: 500px;
+
+}
+.field{
+	width: 94%;
+	height: 94%;
+	top: 3%;
+	margin: 0 auto;
+	position: relative;
+	border:1px solid black;
+	background: lightyellow;
+	
+
+}
