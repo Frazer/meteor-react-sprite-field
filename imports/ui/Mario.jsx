@@ -10,7 +10,8 @@ export default class Mario extends Component {
 
     this.outfits = 3;
     this.animation_steps = 3;
-    
+    this.characterType='mario';
+
     this.downKey=40;  // S - AWSD
     this.upKey=38;  //  W - AWSD
     this.leftKey=37;   //A -  AWSD
@@ -139,8 +140,9 @@ export default class Mario extends Component {
 
           }
         }
-        if (keys[39] && keys[38]){updates.cd = 'U';}   // correct for sprite L/R icon over-writing correct image
-        if (keys[40] && keys[37]){updates.cd = 'D';}
+
+        if (keys[this.rightKey] && keys[this.upKey]){updates.cd = 'U';}   // correct for sprite L/R icon over-writing correct image
+        if (keys[this.downKey] && keys[this.leftKey]){updates.cd = 'D';}
 
         if (walkDiag == 1){
           updates.cloth = 1;
@@ -187,7 +189,7 @@ export default class Mario extends Component {
           
 
 
-    let character="mario-"+charIDcol+"-"+charIDrow+"-"+ this.state.cd +"-"+ this.state.walkpos;
+    let character=this.characterType+"-"+charIDcol+"-"+charIDrow+"-"+ this.state.cd +"-"+ this.state.walkpos;
     return (
             <div className={character} style={characterTransform}></div>
     );

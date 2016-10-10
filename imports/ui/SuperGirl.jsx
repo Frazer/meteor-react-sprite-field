@@ -44,7 +44,7 @@ export default class SuperGirl extends Component {
   }
 
 
-updateFrame() {
+  updateFrame() {
       let keys = this.props.keys;
       let updates = {};
       //console.log(key);
@@ -184,7 +184,7 @@ updateFrame() {
       
 
 
-    let character=this.characterType +"-"+charIDcol+"-"+charIDrow+"-"+ this.state.cd +"-"+ this.state.walkpos;
+    let character=this.characterType+"-"+charIDcol+"-"+charIDrow+"-"+ this.state.cd +"-"+ this.state.walkpos;
     return (
             <div className={character} style={characterTransform}></div>
     );

@@ -10,6 +10,8 @@ export default class DemonHunters extends Component {
 
     this.outfits = 8;
     this.animation_steps = 3;
+    this.characterType = 'good_guys';    
+
 
     this.downKey=83;  // S - AWSD
     this.upKey=87;  //  W - AWSD
@@ -194,7 +196,7 @@ export default class DemonHunters extends Component {
     } 
     
 
-    let character="good_guys-"+charIDcol+"-"+charIDrow+"-"+ this.state.cd +"-"+ this.state.walkpos;
+    let character=this.characterType+"-"+charIDcol+"-"+charIDrow+"-"+ this.state.cd +"-"+ this.state.walkpos;
     return (
             <div className={character} style={characterTransform}></div>
     );
