@@ -2,7 +2,7 @@
 @mixin sprite($name, $url, $width, $height) {
 	%#{$name} {
 	  background-repeat: no-repeat;	
-	  position: relative;
+	  position: absolute;
 	  background-image: url($url);
 	  width: $width;
 	  height: $height;
