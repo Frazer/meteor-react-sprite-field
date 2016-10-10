@@ -162,19 +162,22 @@ updateFrame() {
     let charIDcol = this.state.cloth %4;
     let charIDrow = ~~(this.state.cloth /4);
 
+    let scaleString ="scale(" + this.state.sprite_multiplier + ")"
+
     let characterTransform = {
       left : this.state.xPos,
       top: this.state.yPos,
 
-      transform: "scale(" + this.state.sprite_multiplier + ")",
+
+      transform: scaleString,
       transformOrigin: '0 0',
-      MozTransform: "scale(" + this.state.sprite_multiplier + ")",
+      MozTransform: scaleString,
       MozTransformOrigin: '0 0',
-      WebkitTransform: "scale(" + this.state.sprite_multiplier + ")",
+      WebkitTransform: scaleString,
       WebkitTransformOrigin: '0 0',
-      Otransform: "scale(" + this.state.sprite_multiplier + ")",
+      Otransform: scaleString,
       OTransformOrigin: '0 0',
-      msTransform: "scale(" + this.state.sprite_multiplier + ")",
+      msTransform: scaleString,
       msTransformOrigin: '0 0',
       
     } 
