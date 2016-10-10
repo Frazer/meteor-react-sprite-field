@@ -10,6 +10,12 @@ export default class DemonHunters extends Component {
 
     this.outfits = 8;
     this.animation_steps = 3;
+
+    this.downKey=83;  // S - AWSD
+    this.upKey=87;  //  W - AWSD
+    this.leftKey=65;   //A -  AWSD
+    this.rightKey=68; // D - AWSD
+
     
 
     this.state = {
@@ -22,6 +28,7 @@ export default class DemonHunters extends Component {
       fieldHeight: 500*0.94,
       speed: 5,
       sprite_multiplier: 1,
+      lastClothChange: 0,
     };
     
   }
@@ -43,11 +50,16 @@ export default class DemonHunters extends Component {
       //console.log(key);
 
         if (keys[67]){// c is pressed
-          let cloth = this.state.cloth +1;
-          if (cloth==    this.outfits){cloth=0;}
-          // this.setState({cloth: cloth});
-          updates.cloth = cloth;
+          let timeNow = (new Date()).getTime();
+          if (timeNow - this.state.lastClothChange  > 300){
+            let cloth = this.state.cloth +1;
+            if (cloth==    this.outfits){cloth=0;}
+            // this.setState({cloth: cloth});
+            updates.cloth = cloth;
+            updates.lastClothChange = timeNow;
 
+          }  
+            
         }
 
         if (keys[189] || keys[173]){// - is pressed
@@ -80,11 +92,43 @@ export default class DemonHunters extends Component {
  
         }
 
+        let walkDiag =0;
+
+        let yPosChange = 0;
+        let xPosChange = 0;
+
+        if (keys[this.downKey] ){  // D
+          walkDiag = -1;
+
+          if(this.state.yPos<this.state.fieldHeight-this.sprite_height*this.state.sprite_multiplier-this.state.speed){
+            updates.cd = 'D';
+            yPosChange = this.state.speed;
+            updates.walkpos =  (this.state.walkpos+1)% this.animation_steps;            
+          }else{
+            updates.cd = 'D';
+            updates.yPos = this.state.fieldHeight-this.sprite_height*this.state.sprite_multiplier;
+
+          }
+        }
+        if (keys[this.upKey]){  //  U
+          walkDiag = -1;
+          if (this.state.yPos-this.state.speed>1){
+            updates.cd = 'U';
+            yPosChange = -this.state.speed;
+            updates.walkpos =  (this.state.walkpos+1)% this.animation_steps;
+
+          }else{
+            updates.cd = 'U';
+            updates.yPos = 0;
+
+          }
+        }
         
-        if (keys[65]){   //A -  AWSD
+        if (keys[this.leftKey]){   //L -L/R/U/P
+          walkDiag *= -1;
           if (this.state.xPos-this.state.speed>1){
             updates.cd = 'L';
-            updates.xPos = this.state.xPos-this.state.speed;
+            xPosChange = -this.state.speed;
             updates.walkpos =  (this.state.walkpos+1)% this.animation_steps;
 
             
@@ -94,22 +138,11 @@ export default class DemonHunters extends Component {
 
           }
         }
-        if (keys[87]){  //  W - AWSD
-          if (this.state.yPos-this.state.speed>1){
-            updates.cd = 'U';
-            updates.yPos = this.state.yPos-this.state.speed;
-            updates.walkpos =  (this.state.walkpos+1)% this.animation_steps;
-
-          }else{
-            updates.cd = 'U';
-            updates.yPos = 0;
-
-          }
-        }
-        if (keys[68] ){ // D - AWSD
+        if (keys[this.rightKey] ){ // R
+          walkDiag *= -1;
           if ( this.state.xPos<this.state.fieldWidth-this.sprite_width*this.state.sprite_multiplier-this.state.speed){
             updates.cd = 'R';
-            updates.xPos = this.state.xPos+this.state.speed;
+            xPosChange = this.state.speed;
             updates.walkpos =  (this.state.walkpos+1)% this.animation_steps;
 
             
@@ -119,18 +152,13 @@ export default class DemonHunters extends Component {
 
           }
         }
-        if (keys[83] ){  // S - AWSD
-          if(this.state.yPos<this.state.fieldHeight-this.sprite_height*this.state.sprite_multiplier-this.state.speed){
-            updates.cd = 'D';
-            updates.yPos = this.state.yPos+this.state.speed;
-            updates.walkpos =  (this.state.walkpos+1)% this.animation_steps;
 
-            
-          }else{
-            updates.cd = 'D';
-            updates.yPos = this.state.fieldHeight-this.sprite_height*this.state.sprite_multiplier;
-
-          }
+        if (walkDiag == 1){
+          updates.xPos = this.state.xPos+xPosChange*0.7;
+          updates.yPos = this.state.yPos+yPosChange*0.7;
+        }else{
+          updates.xPos = this.state.xPos+xPosChange;
+          updates.yPos = this.state.yPos+yPosChange;
         }
 
         if (updates.walkpos ==  this.animation_steps){updates.walkpos = 0;}

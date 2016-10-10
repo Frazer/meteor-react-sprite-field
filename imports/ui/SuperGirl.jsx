@@ -12,6 +12,12 @@ export default class SuperGirl extends Component {
     this.animation_steps = 8;
     this.characterType = 'super_girl';    
 
+    
+    this.downKey=75;  // K - JIKL
+    this.upKey=73;  //  I
+    this.leftKey=74;   //J
+    this.rightKey=76; // L
+
     this.state = {
       cd: 'D',
       cloth: 0,
@@ -38,16 +44,10 @@ export default class SuperGirl extends Component {
   }
 
 
-
-  updateFrame() {
+updateFrame() {
       let keys = this.props.keys;
-
-        if (keys[67]){// c is pressed
-          let cloth = this.state.cloth +1;
-          if (cloth==    this.outfits){cloth=0;}
-          this.setState({cloth: cloth});
-          return;
-        }
+      let updates = {};
+      //console.log(key);
 
         if (keys[189] || keys[173]){// - is pressed
           let size = this.state.sprite_multiplier ;
@@ -56,9 +56,9 @@ export default class SuperGirl extends Component {
           }else{
             size = this.state.sprite_multiplier / 2;
           }
+          updates.sprite_multiplier = size;
+          //this.setState({sprite_multiplier: size});
           
-          this.setState({sprite_multiplier: size});
-          return;
         }
 
 
@@ -67,54 +67,96 @@ export default class SuperGirl extends Component {
 
           if (this.state.sprite_multiplier<2){
             let size = this.state.sprite_multiplier + 0.1;
-            this.setState({sprite_multiplier: size});
+            updates.sprite_multiplier = size;
+            if (this.state.xPos>this.state.fieldWidth-this.sprite_width*size){
+              updates.xPos = this.state.fieldWidth-this.sprite_width*size;
+            }
+            if(this.state.yPos>this.state.fieldHeight-this.sprite_height*size){
+              updates.yPos = this.state.fieldHeight-this.sprite_height*size;
+            }
+
           }
-          return;
+ 
         }
 
-        
-        if (keys[37]){
-          if (this.state.xPos-this.state.speed>1){
-            this.setState({cd: 'L', xPos: this.state.xPos-this.state.speed, 
-                 walkpos: (this.state.walkpos+1)% this.animation_steps});
-            return;
-          }else{
-            this.setState({cd: 'L', xPos: 0});
-            return;
-          }
-        }
-        if (keys[38]){
-          if (this.state.yPos-this.state.speed>1){
-            this.setState({cd: 'U' , yPos: this.state.yPos-this.state.speed, 
-              walkpos: (this.state.walkpos+1)%this.animation_steps});
-            return;
-          }else{
-            this.setState({cd: 'U' , yPos: 0});
-            return;
-          }
-        }
-        if (keys[39] ){
-          if ( this.state.xPos<this.state.fieldWidth-this.sprite_width*this.state.sprite_multiplier-this.state.speed){
-            this.setState({cd: 'R', xPos: this.state.xPos+this.state.speed, 
-              walkpos: (this.state.walkpos+1)%this.animation_steps});
-            return;
-          }else{
-            this.setState({cd: 'R', xPos: this.state.fieldWidth-this.sprite_width*this.state.sprite_multiplier});
-            return;
-          }
-        }
-        if (keys[40] ){
+        let walkDiag =0;
+
+        let yPosChange = 0;
+        let xPosChange = 0;
+
+        if (keys[this.downKey] ){  // D
+          walkDiag = -1;
+
           if(this.state.yPos<this.state.fieldHeight-this.sprite_height*this.state.sprite_multiplier-this.state.speed){
-            this.setState({cd: 'D', yPos: this.state.yPos+this.state.speed, 
-              walkpos: (this.state.walkpos+1)%this.animation_steps});
-            return;
+            updates.cd = 'D';
+            yPosChange = this.state.speed;
+            updates.walkpos =  (this.state.walkpos+1)% this.animation_steps;            
           }else{
-            this.setState({cd: 'D', yPos: this.state.fieldHeight-this.sprite_height*this.state.sprite_multiplier});
-            return;
+            updates.cd = 'D';
+            updates.yPos = this.state.fieldHeight-this.sprite_height*this.state.sprite_multiplier;
+
           }
+        }
+        if (keys[this.upKey]){  //  U
+          walkDiag = -1;
+          if (this.state.yPos-this.state.speed>1){
+            updates.cd = 'U';
+            yPosChange = -this.state.speed;
+            updates.walkpos =  (this.state.walkpos+1)% this.animation_steps;
+
+          }else{
+            updates.cd = 'U';
+            updates.yPos = 0;
+
+          }
+        }
+        
+        if (keys[this.leftKey]){   //L -L/R/U/P
+          walkDiag *= -1;
+          if (this.state.xPos-this.state.speed>1){
+            updates.cd = 'L';
+            xPosChange = -this.state.speed;
+            updates.walkpos =  (this.state.walkpos+1)% this.animation_steps;
+
+            
+          }else{
+            updates.cd = 'L';
+            updates.xPos = 0;
+
+          }
+        }
+        if (keys[this.rightKey] ){ // R
+          walkDiag *= -1;
+          if ( this.state.xPos<this.state.fieldWidth-this.sprite_width*this.state.sprite_multiplier-this.state.speed){
+            updates.cd = 'R';
+            xPosChange = this.state.speed;
+            updates.walkpos =  (this.state.walkpos+1)% this.animation_steps;
+
+            
+          }else{
+            updates.cd = 'R';
+            updates.xPos = this.state.fieldWidth-this.sprite_width*this.state.sprite_multiplier;
+
+          }
+        }
+
+        if (walkDiag == 1){
+          updates.xPos = this.state.xPos+xPosChange*0.7;
+          updates.yPos = this.state.yPos+yPosChange*0.7;
+        }else{
+          updates.xPos = this.state.xPos+xPosChange;
+          updates.yPos = this.state.yPos+yPosChange;
+        }
+
+        if (updates.walkpos ==  this.animation_steps){updates.walkpos = 0;}
+        //console.log(updates);
+        if(Object.keys(updates).length ){
+          this.setState(updates);
         }
         
   }
+
+
 
   render() {
     let charIDcol = this.state.cloth %4;
