@@ -13,12 +13,42 @@ export default class App extends Component {
     
 
     this.state = {
+      dt: 0,
     };
     window.addEventListener("keydown", this.keyPressedListener.bind(this), true);
     window.addEventListener("keyup", this.keyReleasedListener.bind(this), true);
     this.keysPressed = {};
 
+    this.now;
+    this.last = this.timestamp();
+    //this.step = 1/60;
+    this.timestamp = this.timestamp.bind(this);
+    this.frame = this.frame.bind(this);
+
+
+    requestAnimationFrame(this.frame);
+
   }
+
+  timestamp() {
+    return window.performance && window.performance.now ? window.performance.now() : new Date().getTime();
+  }
+
+  frame() {
+    this.now = this.timestamp();
+    this.setState({timeTicker:  {dt: Math.min(1, (this.now - this.last) / 1000), time: this.now} });
+    //this.dt = this.dt + Math.min(1, (this.now - this.last) / 1000);
+    // while(this.dt > this.step) {
+    //   this.dt = this.dt - this.step;
+    //   update(step);   //  done for physics engine to be smooth
+    // }
+    // render(dt);
+    // console.log(this.dt + "render");
+     //console.log(this.state.dt + "render");
+    this.last = this.now;
+    requestAnimationFrame(this.frame);
+  }
+
   keyPressedListener(e) {
     let key = e.keyCode ? e.keyCode : e.which;
     this.keysPressed[key] = true;
@@ -62,10 +92,10 @@ export default class App extends Component {
 
           <div className="field">
             
-            <GeneralCharacter data={superGirl}  keys={this.keysPressed} />
+            <GeneralCharacter data={superGirl}  keys={this.keysPressed} ticker={this.state.timeTicker} />
             
-            <GeneralCharacter data={goodGuy}  keys={this.keysPressed} />
-            <GeneralCharacter data={mario}  keys={this.keysPressed} />
+            <GeneralCharacter data={goodGuy}  keys={this.keysPressed} ticker={this.state.timeTicker} />
+            <GeneralCharacter data={mario}  keys={this.keysPressed} ticker={this.state.timeTicker} />
           </div>      
         </div>
 

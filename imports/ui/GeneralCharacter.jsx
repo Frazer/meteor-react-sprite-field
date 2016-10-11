@@ -16,7 +16,7 @@ export default class GeneralCharacter extends Component {
     this.charactersPerRowInSpriteMap = this.props.data.config.charactersPerRowInSpriteMap;
     this.animates_diagonally =  this.props.data.config.animates_diagonally;
 
-
+    this.stepTime = 300/this.animation_steps;
 
 
     this.state = {
@@ -26,6 +26,7 @@ export default class GeneralCharacter extends Component {
       fieldWidth: 800*0.94,
       fieldHeight: 500*0.94,
       lastClothChange: 0,
+      lastStepChange: 0,
 
 
     
@@ -40,26 +41,23 @@ export default class GeneralCharacter extends Component {
       sprite_multiplier: this.props.data.config.sprite_multiplier,
     
     };
+
+    this.updateFrame = this.updateFrame.bind(this);
     
   }
 
 
-  componentDidMount() {
-    this.gameLooper = setInterval(() => {
-      this.updateFrame();
-    }, 50);
-  }
-  
-  componentWillUnmount() {
-    clearInterval(this.gameLooper);
+  componentWillReceiveProps(props) {
+    this.updateFrame(props.ticker);
   }
 
-  updateFrame() {
+  updateFrame(ticker) {
       let keys = this.props.keys;
       let updates = {};
+      let timeNow = ticker.time;
 
         if (this.canChangeClothes && keys[67]){// c is pressed
-          let timeNow = (new Date()).getTime();
+          
           let cloth = this.state.cloth;
           if (timeNow - this.state.lastClothChange  > 300){
             if (this.animates_diagonally){
@@ -110,6 +108,7 @@ export default class GeneralCharacter extends Component {
 
         let yPosChange = 0;
         let xPosChange = 0;
+        let walkposFlag = false;
 
         if (keys[this.state.downKey] ){  // D
           walkDiag = -1;
@@ -117,7 +116,7 @@ export default class GeneralCharacter extends Component {
           if(this.state.yPos<this.state.fieldHeight-this.sprite_height*this.state.sprite_multiplier-this.state.speed){
             updates.cd = 'D';
             yPosChange = this.state.speed;
-            updates.walkpos =  (this.state.walkpos+1)% this.animation_steps;            
+            walkposFlag =  true;            
           }else{
             updates.cd = 'D';
             updates.yPos = this.state.fieldHeight-this.sprite_height*this.state.sprite_multiplier;
@@ -129,7 +128,7 @@ export default class GeneralCharacter extends Component {
           if (this.state.yPos-this.state.speed>1){
             updates.cd = 'U';
             yPosChange = -this.state.speed;
-            updates.walkpos =  (this.state.walkpos+1)% this.animation_steps;
+            walkposFlag =  true;
 
           }else{
             updates.cd = 'U';
@@ -143,7 +142,7 @@ export default class GeneralCharacter extends Component {
           if (this.state.xPos-this.state.speed>1){
             updates.cd = 'L';
             xPosChange = -this.state.speed;
-            updates.walkpos =  (this.state.walkpos+1)% this.animation_steps;
+            walkposFlag =  true;
 
             
           }else{
@@ -157,7 +156,7 @@ export default class GeneralCharacter extends Component {
           if ( this.state.xPos<this.state.fieldWidth-this.sprite_width*this.state.sprite_multiplier-this.state.speed){
             updates.cd = 'R';
             xPosChange = this.state.speed;
-            updates.walkpos =  (this.state.walkpos+1)% this.animation_steps;
+            walkposFlag =  true;
 
             
           }else{
@@ -172,6 +171,9 @@ export default class GeneralCharacter extends Component {
           if (keys[this.state.rightKey] && keys[this.state.upKey]){updates.cd = 'U';}   // correct for sprite L/R icon over-writing correct image
           if (keys[this.state.downKey] && keys[this.state.leftKey]){updates.cd = 'D';}
         }
+
+        xPosChange = xPosChange * ticker.dt *64 ;  // 60 frames a second << 6 means multply by 2^6
+        yPosChange = yPosChange * ticker.dt *64 ;
 
         if (walkDiag == 1){
           if (this.animates_diagonally && !this.state.animatingDiagonally){      
@@ -189,7 +191,12 @@ export default class GeneralCharacter extends Component {
           updates.yPos = this.state.yPos+yPosChange;
         }
 
-        if (updates.walkpos ==  this.animation_steps){updates.walkpos = 0;}
+        if(walkposFlag){
+          if (timeNow - this.state.lastStepChange  > this.stepTime){
+            updates.walkpos =  (this.state.walkpos+1)% this.animation_steps;
+            updates.lastStepChange = timeNow;
+          }  
+        } 
         //console.log(updates);
         if(Object.keys(updates).length ){
           this.setState(updates);
@@ -234,7 +241,9 @@ GeneralCharacter.propTypes = {
   // config:            PropTypes.object,
   // position:          PropTypes.object,
   // controls:          PropTypes.object,
-  data:            PropTypes.object,
+  data:              PropTypes.object,
+  ticker:            PropTypes.object,
+
 
 
 }
