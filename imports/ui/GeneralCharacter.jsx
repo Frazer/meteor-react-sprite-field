@@ -1,35 +1,46 @@
 import React, { Component, PropTypes } from 'react';
  
 
-export default class SuperGirl extends Component {
+export default class GeneralCharacter extends Component {
   constructor(props) {
     super(props);
 
-    this.sprite_height= 123;
-    this.sprite_width=123;
 
-    this.outfits = 1;
-    this.animation_steps = 8;
-    this.characterType = 'super_girl';    
+    this.characterType = this.props.data.config.characterType;
 
-    
-    this.downKey=75;  // K - JIKL
-    this.upKey=73;  //  I
-    this.leftKey=74;   //J
-    this.rightKey=76; // L
+    this.outfits = this.props.data.config.outfits;
+    this.animation_steps = this.props.data.config.animation_steps;
+    this.sprite_height = this.props.data.config.sprite_height;
+    this.sprite_width = this.props.data.config.sprite_width;
+    this.canChangeClothes = this.props.data.config.canChangeClothes;
+    this.charactersPerRowInSpriteMap = this.props.data.config.charactersPerRowInSpriteMap;
+    this.animates_diagonally =  this.props.data.config.animates_diagonally;
+
+
+
 
     this.state = {
       cd: 'D',
       cloth: 0,
       walkpos: 0,
-      xPos: 0,
-      yPos: 0,
       fieldWidth: 800*0.94,
       fieldHeight: 500*0.94,
-      speed: 12,
-      sprite_multiplier: 0.5,
-    };
+      lastClothChange: 0,
 
+
+    
+      downKey: this.props.data.controls.downKey,  // K - JIKL
+      upKey: this.props.data.controls.upKey,  //  I
+      leftKey: this.props.data.controls.leftKey,   //J
+      rightKey: this.props.data.controls.rightKey, // L
+    
+      xPos: this.props.data.position.xPos,
+      yPos: this.props.data.position.yPos,
+      speed: this.props.data.config.speed,
+      sprite_multiplier: this.props.data.config.sprite_multiplier,
+    
+    };
+    
   }
 
 
@@ -43,11 +54,27 @@ export default class SuperGirl extends Component {
     clearInterval(this.gameLooper);
   }
 
-
   updateFrame() {
       let keys = this.props.keys;
       let updates = {};
-      //console.log(key);
+
+        if (this.canChangeClothes && keys[67]){// c is pressed
+          let timeNow = (new Date()).getTime();
+          let cloth = this.state.cloth;
+          if (timeNow - this.state.lastClothChange  > 300){
+            if (this.animates_diagonally){
+              cloth = cloth +2;
+            }else{
+              cloth = cloth +1;
+            }
+
+            if (cloth>=    this.outfits){cloth=cloth-this.outfits;}
+            updates.cloth = cloth;
+            updates.lastClothChange = timeNow;
+
+          }  
+            
+        }
 
         if (keys[189] || keys[173]){// - is pressed
           let size = this.state.sprite_multiplier ;
@@ -84,7 +111,7 @@ export default class SuperGirl extends Component {
         let yPosChange = 0;
         let xPosChange = 0;
 
-        if (keys[this.downKey] ){  // D
+        if (keys[this.state.downKey] ){  // D
           walkDiag = -1;
 
           if(this.state.yPos<this.state.fieldHeight-this.sprite_height*this.state.sprite_multiplier-this.state.speed){
@@ -97,7 +124,7 @@ export default class SuperGirl extends Component {
 
           }
         }
-        if (keys[this.upKey]){  //  U
+        if (keys[this.state.upKey]){  //  U
           walkDiag = -1;
           if (this.state.yPos-this.state.speed>1){
             updates.cd = 'U';
@@ -111,7 +138,7 @@ export default class SuperGirl extends Component {
           }
         }
         
-        if (keys[this.leftKey]){   //L -L/R/U/P
+        if (keys[this.state.leftKey]){   //L -L/R/U/P
           walkDiag *= -1;
           if (this.state.xPos-this.state.speed>1){
             updates.cd = 'L';
@@ -125,7 +152,7 @@ export default class SuperGirl extends Component {
 
           }
         }
-        if (keys[this.rightKey] ){ // R
+        if (keys[this.state.rightKey] ){ // R
           walkDiag *= -1;
           if ( this.state.xPos<this.state.fieldWidth-this.sprite_width*this.state.sprite_multiplier-this.state.speed){
             updates.cd = 'R';
@@ -140,10 +167,24 @@ export default class SuperGirl extends Component {
           }
         }
 
+        if (this.animates_diagonally){
+
+          if (keys[this.state.rightKey] && keys[this.state.upKey]){updates.cd = 'U';}   // correct for sprite L/R icon over-writing correct image
+          if (keys[this.state.downKey] && keys[this.state.leftKey]){updates.cd = 'D';}
+        }
+
         if (walkDiag == 1){
+          if (this.animates_diagonally && !this.state.animatingDiagonally){      
+            updates.cloth = this.state.cloth+1; 
+            updates.animatingDiagonally =true;
+          }
           updates.xPos = this.state.xPos+xPosChange*0.7;
           updates.yPos = this.state.yPos+yPosChange*0.7;
         }else{
+          if (this.animates_diagonally && this.state.animatingDiagonally){      
+            updates.cloth = this.state.cloth-1; 
+            updates.animatingDiagonally =false;
+          }
           updates.xPos = this.state.xPos+xPosChange;
           updates.yPos = this.state.yPos+yPosChange;
         }
@@ -156,11 +197,9 @@ export default class SuperGirl extends Component {
         
   }
 
-
-
   render() {
-    let charIDcol = this.state.cloth %4;
-    let charIDrow = ~~(this.state.cloth /4);
+    let charIDcol = this.state.cloth % this.charactersPerRowInSpriteMap;
+    let charIDrow = ~~(this.state.cloth / this.charactersPerRowInSpriteMap );
 
     let scaleString ="scale(" + this.state.sprite_multiplier + ")"
 
@@ -181,8 +220,7 @@ export default class SuperGirl extends Component {
       msTransformOrigin: '0 0',
       
     } 
-      
-
+    
 
     let character=this.characterType+"-"+charIDcol+"-"+charIDrow+"-"+ this.state.cd +"-"+ this.state.walkpos;
     return (
@@ -191,6 +229,72 @@ export default class SuperGirl extends Component {
   }
 }
 
-SuperGirl.propTypes = {
+GeneralCharacter.propTypes = {
   keys:              PropTypes.object,
+  // config:            PropTypes.object,
+  // position:          PropTypes.object,
+  // controls:          PropTypes.object,
+  data:            PropTypes.object,
+
+
+}
+
+
+
+
+export const Mario =  {
+
+    characterType : 'mario',
+
+    outfits:  2,
+    animation_steps:  3,
+    sprite_height:  40,
+    sprite_width:  28,
+
+    speed:  5,
+    sprite_multiplier:  1,
+
+    animates_diagonally: true,
+    canChangeClothes: false,
+
+    charactersPerRowInSpriteMap: 2,
+};
+
+export const GoodGuys =  {
+
+    characterType : 'good_guys',
+
+    outfits:  8,
+    animation_steps:  3,
+    sprite_height:  32,
+    sprite_width:  32,
+
+    speed:  6,
+    sprite_multiplier:  1.2,
+
+    animates_diagonally: false,
+
+    canChangeClothes: true,
+
+    charactersPerRowInSpriteMap: 4,
+};
+
+export const SuperGirl = {
+
+    characterType : 'super_girl',
+
+    outfits:  1,
+    animation_steps:  8,
+    sprite_height:  123,
+    sprite_width:  123,
+
+    speed:  5,
+    sprite_multiplier:  0.4,
+
+    animates_diagonally: false,
+
+    canChangeClothes: false,
+
+    charactersPerRowInSpriteMap: 1,
+
 }

@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 
-import SuperGirl  from './SuperGirl.jsx';
-import Mario  from './Mario.jsx';
-import DemonHunters  from './DemonHunters.jsx';
+
+import GeneralCharacter, {Mario, GoodGuys, SuperGirl}  from './GeneralCharacter.jsx';
  
+import {ASWDcontrols, JIKLcontrols, ArrowControls} from './controls.jsx';
+
 
 // App component - represents the whole app
 export default class App extends Component {
@@ -27,19 +28,44 @@ export default class App extends Component {
     this.keysPressed[key] = false;
   }
 
+  characterConstructor(characterTemplate, controlKeys, x=20, y=20 ,speed, size){
+
+    position = {};
+    position.xPos =  x;
+    position.yPos =  y;
+    
+    characterTemplate.speed =  typeof speed !== 'undefined' ? speed : characterTemplate.speed; 
+    characterTemplate.sprite_multiplier =  typeof size !== 'undefined' ? size : characterTemplate.sprite_multiplier; 
+
+    characterData = {
+      position: position,
+      controls: controlKeys,
+      config: characterTemplate,
+    };
+    
+    return characterData;
+  }
+
  
   render() {
+
+    let goodGuy = this.characterConstructor(GoodGuys, ASWDcontrols, 200, 200);
+    let mario = this.characterConstructor(Mario, ArrowControls, 400, 400);
+    let superGirl = this.characterConstructor(SuperGirl, JIKLcontrols, 400, 100);
+
     return (
       <div className="container">
         <header>
-          <h1 className="neon">Frazzle Land</h1>
+          <h1 className="neon">Sprite Canvas</h1>
         </header>
         <div className="field_border">
 
           <div className="field">
-            <Mario keys={this.keysPressed} />
-            <SuperGirl keys={this.keysPressed} />
-            <DemonHunters keys={this.keysPressed} />
+            
+            <GeneralCharacter data={superGirl}  keys={this.keysPressed} />
+            
+            <GeneralCharacter data={goodGuy}  keys={this.keysPressed} />
+            <GeneralCharacter data={mario}  keys={this.keysPressed} />
           </div>      
         </div>
 
