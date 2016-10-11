@@ -4,7 +4,7 @@ A simple play field, key listeners to control each character, sprites managed wi
 
 
 
-All done in react on top of meteor.  Meteor is currently not even used, other than the startup Render function.
+All done in react on top of meteor.  Meteor is currently not even used, other than as the server and to startup the root Render function.
 Meteor could be used to manage users and to store game data and share across multiple users.  
 
 
