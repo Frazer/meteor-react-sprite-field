@@ -2,6 +2,9 @@
 
 A simple play field, key listener in App passed to each character, sprites managed with scss and state variables.
 
+![screenshot](screenshot.png)
+
+
 requestAnimationFrame  loop runs in App, and sends a ticker to whatever needs to update.
 
 All done in react on top of meteor.  Meteor is currently not even used, other than as the server and to startup the root Render function.
